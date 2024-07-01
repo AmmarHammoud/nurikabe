@@ -39,10 +39,10 @@ class Grid {
 
   List<dynamic> _adjacentCells(Cell c) {
     return [
-      c.i - 1 >= 0 ? Cell(c.i - 1, c.j, c.v) : -1,
-      c.i + 1 < _rows ? Cell(c.i + 1, c.j, c.v) : -1,
-      c.j - 1 >= 0 ? Cell(c.i, c.j - 1, c.v) : -1,
-      c.j + 1 < _columns ? Cell(c.i, c.j + 1, c.v) : -1,
+      c.i - 1 >= 0 ? Cell(c.i - 1, c.j, _grid[c.i - 1][c.j].v) : -1,
+      c.i + 1 < _rows ? Cell(c.i + 1, c.j, _grid[c.i + 1][c.j].v) : -1,
+      c.j - 1 >= 0 ? Cell(c.i, c.j - 1, _grid[c.i][c.j - 1].v) : -1,
+      c.j + 1 < _columns ? Cell(c.i, c.j + 1, _grid[c.i][c.j + 1].v) : -1,
     ];
   }
 
@@ -56,6 +56,13 @@ class Grid {
   List<dynamic> _rightAndDownAdjacentCells(Cell c) {
     return [
       c.j + 1 < _columns ? Cell(c.i, c.j + 1, _grid[c.i][c.j + 1].v) : -1,
+      c.i + 1 < _rows ? Cell(c.i + 1, c.j, _grid[c.i + 1][c.j].v) : -1,
+    ];
+  }
+
+  List<dynamic> _leftAndDownAdjacentCells(Cell c) {
+    return [
+      c.j - 1 < _columns ? Cell(c.i, c.j - 1, _grid[c.i][c.j - 1].v) : -1,
       c.i + 1 < _rows ? Cell(c.i + 1, c.j, _grid[c.i + 1][c.j].v) : -1,
     ];
   }
@@ -93,9 +100,37 @@ class Grid {
 
   _fillRightAndDownOfTwoDiagonallyAdjacentFixedCells() {
     for (var e in fixedCells) {
-      var adj = _rightAndDownAdjacentCells(e);
       if (_validPosition(e.i + 1, e.j + 1) && _grid[e.i + 1][e.j + 1].v > -1) {
-        _fillWithSea(adj);
+        _fillWithSea(_rightAndDownAdjacentCells(e));
+      }
+      if (_validPosition(e.i + 1, e.j - 1) && _grid[e.i + 1][e.j - 1].v > -1) {
+        _fillWithSea(_leftAndDownAdjacentCells(e));
+      }
+    }
+  }
+
+  bool _checkAllAdjacentAreSea(Cell c) {
+    var adj = _adjacentCells(c);
+    bool check = true;
+    for (var e in adj) {
+      check = check && (e == -1 || e.v == -2);
+    }
+    return check;
+  }
+
+  _fillEmptySquareSurroundedBySeaWithSea() {
+    // for (var e in fixedCells) {
+    //   if (e.v != -1) continue;
+    //   if (_checkAllAdjacentAreSea(e)) {
+    //     _grid[e.i][e.j].v = -2;
+    //   }
+    // }
+    for (var rows in _grid) {
+      for (var e in rows) {
+        if (e.v != -1) continue;
+        if (_checkAllAdjacentAreSea(e)) {
+          _grid[e.i][e.j].v = -2;
+        }
       }
     }
   }
@@ -197,7 +232,11 @@ class Grid {
     _fillRightAndDownOfTwoDiagonallyAdjacentFixedCells();
     _printForComparison(before, _grid);
     stdout.write('\n\n');
+    before = _copyGrid();
 
+    _fillEmptySquareSurroundedBySeaWithSea();
+    _printForComparison(before, _grid);
+    stdout.write('\n\n');
     //print();
   }
 }

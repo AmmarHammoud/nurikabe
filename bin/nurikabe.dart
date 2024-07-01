@@ -42,8 +42,25 @@ void main(List<String> arguments) {
     Cell(2, 4, 3),
     Cell(3, 1, 2),
   ];
-  Grid grid = Grid(5, 5, fixedCells4);
+  List<Cell> fixedCellsFinal = [
+    Cell(0, 0, 2),
+    Cell(0, 2, 3),
+    Cell(1, 4, 1),
+    Cell(3, 1, 3),
+    Cell(3, 3, 1),
+    Cell(4, 0, 2),
+  ];
+  Grid grid = Grid(5, 5, fixedCellsFinal);
+/*assert(grid_dimension(5, 5)),
+    assert(fxd_cell(1, 1, 2)),
+    assert(fxd_cell(1, 3, 3)),
 
+    assert(fxd_cell(2, 5, 1)),
+
+    assert(fxd_cell(4, 2, 3)),
+    assert(fxd_cell(4, 4, 1)),
+
+    assert(fxd_cell(5, 1, 2)),*/
   //grid.print();
   grid.solve();
 }
